@@ -17,7 +17,7 @@ router.post('/register', (req, res) => {
       res.status(500).json(error);
     });
 });
-
+//here is a good place to add cookie
 router.post('/login', (req, res) => {
   let { username, password } = req.body;
 
@@ -25,6 +25,9 @@ router.post('/login', (req, res) => {
     .first()
     .then(user => {
       if (user && bcrypt.compareSync(password, user.password)) {
+        //save a session for the client and send back a cookie
+        req.session.user = user;
+
         res.status(200).json({
           message: `Welcome ${user.username}!`,
         });
