@@ -17,7 +17,7 @@ router.post('/register', (req, res) => {
       res.status(500).json(error);
     });
 });
-
+//here is a good place to add cookie
 router.post('/login', (req, res) => {
   let { username, password } = req.body;
 
@@ -25,6 +25,9 @@ router.post('/login', (req, res) => {
     .first()
     .then(user => {
       if (user && bcrypt.compareSync(password, user.password)) {
+        //save a session for the client and send back a cookie
+        req.session.user = user;
+
         res.status(200).json({
           message: `Welcome ${user.username}!`,
         });
@@ -35,6 +38,23 @@ router.post('/login', (req, res) => {
     .catch(error => {
       res.status(500).json(error);
     });
+});
+
+router.get("/logout", (req, res) => {
+  if (req.session) {
+    req.session.destroy(error => {
+      if (error) {
+        res.status(500).json({
+          message:
+            "you can checkout any time you like, but you can never leave!!!!!",
+        });
+      } else {
+        res.status(200).json({ message: "logged out" });
+      }
+    });
+  } else {
+    res.status(200).end();
+  }
 });
 
 module.exports = router;
